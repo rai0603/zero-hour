@@ -18,7 +18,7 @@ const ProfileOptionButton = memo(function ProfileOptionButton({
   onToggle: (v: string) => void
 }) {
   const [imgLoaded, setImgLoaded] = useState(false)
-  const imgPath = `/images/profile/${questionId}_${value}.png`
+  const imgPath = `/images/profile/${questionId}_${value}.jpg`
 
   return (
     <button
