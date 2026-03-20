@@ -1,4 +1,3 @@
-import { useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useGameStore } from '../../store/gameStore'
 
@@ -52,11 +51,6 @@ export default function FeedbackOverlay() {
   const option = lastChosenOption
   const cfg = config[option?.type ?? 'OPTIMAL']
 
-  useEffect(() => {
-    const timer = setTimeout(advanceQuestion, cfg.delay)
-    return () => clearTimeout(timer)
-  }, [advanceQuestion, cfg.delay])
-
   if (!option) return null
 
   return (
@@ -106,17 +100,15 @@ export default function FeedbackOverlay() {
           </motion.div>
         )}
 
-        {option.type !== 'FATAL' && (
-          <motion.button
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1 }}
-            onClick={advanceQuestion}
-            className="mt-6 text-gray-500 text-xs hover:text-gray-300 transition-colors"
-          >
-            點擊繼續 →
-          </motion.button>
-        )}
+        <motion.button
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.8 }}
+          onClick={advanceQuestion}
+          className="mt-6 w-full py-3 rounded-lg bg-gray-800 hover:bg-gray-700 active:bg-gray-600 text-gray-200 text-sm font-bold transition-colors"
+        >
+          繼續 →
+        </motion.button>
       </div>
     </motion.div>
   )

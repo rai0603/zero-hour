@@ -1,0 +1,17 @@
+{
+  "name": "零時生存 ZERO HOUR",
+  "short_name": "零時生存",
+  "description": "台灣災難應變能力測試",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#0a0a0a",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
