@@ -1,0 +1,90 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Black+Ops+One&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&family=Noto+Serif+SC:wght@900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 20 10% 8%;
+    --foreground: 35 20% 80%;
+    --card: 20 12% 12%;
+    --border: 25 30% 22%;
+    --rust: 25 90% 50%;
+    --blood: 0 70% 35%;
+    --ash: 20 5% 40%;
+    --dust: 35 30% 65%;
+    --warning-yellow: 45 95% 55%;
+    --gradient-dark: radial-gradient(ellipse at center, hsl(20, 15%, 14%) 0%, hsl(20, 10%, 6%) 70%);
+    --gradient-vignette: radial-gradient(ellipse at center, transparent 50%, hsl(20, 10%, 4%) 100%);
+    --gradient-fire: linear-gradient(135deg, hsl(0, 70%, 35%), hsl(25, 90%, 50%), hsl(45, 95%, 55%));
+    --shadow-fire: 0 0 30px -5px hsl(25 90% 50% / 0.4);
+    --shadow-glow: 0 0 40px -10px hsl(25 90% 50% / 0.3);
+  }
+}
+
+.text-rust { color: hsl(var(--rust)); }
+.text-dust { color: hsl(var(--dust)); }
+.bg-gradient-dark { background: var(--gradient-dark); }
+.shadow-fire { box-shadow: var(--shadow-fire); }
+.shadow-glow { box-shadow: var(--shadow-glow); }
+.bg-gradient-fire { background: var(--gradient-fire); }
+
+.hazard-tape {
+  background: repeating-linear-gradient(-45deg, hsl(45, 95%, 55%), hsl(45, 95%, 55%) 10px, hsl(20, 10%, 8%) 10px, hsl(20, 10%, 8%) 20px);
+  height: 4px;
+}
+
+.vignette::after {
+  content: ''; position: fixed; inset: 0;
+  background: var(--gradient-vignette);
+  pointer-events: none; z-index: 1;
+}
+
+.texture-scratched::before {
+  content: ''; position: absolute; inset: 0;
+  background: repeating-linear-gradient(45deg, transparent, transparent 2px, hsl(20 5% 40% / 0.03) 2px, hsl(20 5% 40% / 0.03) 4px);
+  pointer-events: none;
+}
+
+@keyframes dust-float {
+  0%   { transform: translateY(0) translateX(0); opacity: 0; }
+  10%  { opacity: 0.6; }
+  90%  { opacity: 0.6; }
+  100% { transform: translateY(-100vh) translateX(40px); opacity: 0; }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: #0a0a0a;
+  color: #ffffff;
+  font-family: 'Noto Sans TC', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 自訂捲軸 */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: #1a1a1a;
+}
+::-webkit-scrollbar-thumb {
+  background: #444;
+  border-radius: 2px;
+}
