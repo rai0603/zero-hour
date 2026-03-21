@@ -10,6 +10,7 @@ import FeedbackOverlay from './screens/FeedbackOverlay'
 import GameOverScreen from './screens/GameOverScreen'
 import ResultScreen from './screens/ResultScreen'
 import WishPool from './screens/WishPool'
+import AccountScreen from './screens/AccountScreen'
 
 export default function App() {
   const screen = useGameStore(s => s.screen)
@@ -34,6 +35,7 @@ export default function App() {
         {screen === 'gameover' && <GameOverScreen key="gameover" />}
         {screen === 'result' && <ResultScreen key="result" />}
         {screen === 'wishpool' && <WishPool key="wishpool" />}
+        {screen === 'account' && <AccountScreen key="account" />}
       </AnimatePresence>
     </div>
   )

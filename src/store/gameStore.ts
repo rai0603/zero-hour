@@ -27,6 +27,8 @@ interface GameStore extends GameState {
   fullReset: () => void
   saveResult: (userId: string) => Promise<void>
   goToWishPool: () => void
+  goToAccount: () => void
+  goToStart: () => void
 }
 
 const defaultMeta: ScenarioMeta = {
@@ -38,7 +40,7 @@ const defaultMeta: ScenarioMeta = {
   phaseNames: [],
 }
 
-const initialState: Omit<GameStore, 'startGame' | 'setProfile' | 'confirmProfile' | 'selectScenario' | 'startScenario' | 'selectOption' | 'advanceQuestion' | 'restartScenario' | 'fullReset' | 'saveResult' | 'goToWishPool'> = {
+const initialState: Omit<GameStore, 'startGame' | 'setProfile' | 'confirmProfile' | 'selectScenario' | 'startScenario' | 'selectOption' | 'advanceQuestion' | 'restartScenario' | 'fullReset' | 'saveResult' | 'goToWishPool' | 'goToAccount' | 'goToStart'> = {
   screen: 'start',
   selectedScenarioId: null,
   sessionId: crypto.randomUUID(),
@@ -230,6 +232,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
   fullReset: () => set({ ...initialState, sessionId: crypto.randomUUID() }),
 
   goToWishPool: () => set({ screen: 'wishpool' }),
+  goToAccount: () => set({ screen: 'account' }),
+  goToStart: () => set({ screen: 'start' }),
 
   saveResult: async (userId: string) => {
     const state = get()

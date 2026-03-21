@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { useGameStore } from '../../store/gameStore'
+import { useAuth } from '../../contexts/AuthContext'
 
 function DustParticles() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -54,10 +55,30 @@ function DustParticles() {
 export default function StartScreen() {
   const startGame = useGameStore(s => s.startGame)
   const goToWishPool = useGameStore(s => s.goToWishPool)
+  const goToAccount = useGameStore(s => s.goToAccount)
+  const { user } = useAuth()
 
   return (
     <div className="relative min-h-screen bg-gradient-dark flex flex-col items-center justify-center px-4 py-8 vignette overflow-hidden">
       <DustParticles />
+
+      {/* 右上角會員按鈕 */}
+      <button
+        onClick={goToAccount}
+        className="absolute top-4 right-4 z-20 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-black/40 hover:bg-black/60 border border-white/10 text-xs font-bold transition-colors"
+        style={{ color: 'hsl(35, 20%, 70%)' }}
+      >
+        {user ? (
+          <>
+            <span className="w-5 h-5 rounded-full bg-orange-600 flex items-center justify-center text-white text-xs font-black">
+              {user.email?.[0].toUpperCase()}
+            </span>
+            我的帳號
+          </>
+        ) : (
+          <>👤 登入</>
+        )}
+      </button>
 
       <div className="relative z-10 flex flex-col items-center max-w-lg w-full space-y-8 animate-slide-up">
 
