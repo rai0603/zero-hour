@@ -34,33 +34,17 @@ export async function shareNative(element: HTMLElement, grade: string, score: nu
 }
 
 // 分享到 Facebook
-export async function shareToFacebook(element: HTMLElement, grade: string, score: number): Promise<'shared' | 'downloaded'> {
-  const { file, blob } = await captureCard(element, `zerohour-${grade}-${score}.png`)
+export function shareToFacebook(grade: string, score: number): void {
   const text = `我在零時生存的備災等級是 ${grade}（${score}/500 分）！來測試你的應變能力👇\n${APP_URL}`
-
-  if (isMobile && navigator.canShare?.({ files: [file] })) {
-    await navigator.share({ files: [file], title: '零時生存 ZERO HOUR', text })
-    return 'shared'
-  } else {
-    const fbUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(APP_URL)}&quote=${encodeURIComponent(text)}`
-    window.open(fbUrl, '_blank', 'width=600,height=500,noopener')
-    await downloadBlob(blob, `zerohour-${grade}-${score}.png`)
-    return 'downloaded'
-  }
+  const fbUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(APP_URL)}&quote=${encodeURIComponent(text)}`
+  window.open(fbUrl, '_blank', 'width=600,height=500,noopener')
 }
 
-// 分享到 Instagram
-export async function shareToInstagram(element: HTMLElement, grade: string, score: number): Promise<'shared' | 'downloaded'> {
-  const { file, blob } = await captureCard(element, `zerohour-${grade}-${score}.png`)
+// 分享到 Instagram（無 intent URL，複製連結後開啟 IG）
+export async function shareToInstagram(grade: string, score: number): Promise<void> {
   const text = `我在零時生存的備災等級是 ${grade}（${score}/500 分）！來測試你的應變能力👇\n${APP_URL}`
-
-  if (isMobile && navigator.canShare?.({ files: [file] })) {
-    await navigator.share({ files: [file], title: '零時生存 ZERO HOUR', text })
-    return 'shared'
-  } else {
-    await downloadBlob(blob, `zerohour-${grade}-${score}.png`)
-    return 'downloaded'
-  }
+  await navigator.clipboard.writeText(text)
+  window.open('https://www.instagram.com', '_blank', 'noopener')
 }
 
 // 分享邀請卡
