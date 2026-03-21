@@ -18,6 +18,7 @@ interface GameStore extends GameState {
 
   startGame: () => void
   setProfile: (profile: PlayerProfile) => void
+  confirmProfile: () => void
   selectScenario: (scenarioId: string) => void
   startScenario: () => void
   selectOption: (option: Option) => void
@@ -37,7 +38,7 @@ const defaultMeta: ScenarioMeta = {
   phaseNames: [],
 }
 
-const initialState: Omit<GameStore, 'startGame' | 'setProfile' | 'selectScenario' | 'startScenario' | 'selectOption' | 'advanceQuestion' | 'restartScenario' | 'fullReset' | 'saveResult' | 'goToWishPool'> = {
+const initialState: Omit<GameStore, 'startGame' | 'setProfile' | 'confirmProfile' | 'selectScenario' | 'startScenario' | 'selectOption' | 'advanceQuestion' | 'restartScenario' | 'fullReset' | 'saveResult' | 'goToWishPool'> = {
   screen: 'start',
   selectedScenarioId: null,
   sessionId: crypto.randomUUID(),
@@ -72,8 +73,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   setProfile: (profile) => {
     const companionsAlive = [...profile.companions]
-    set({ profile, companionsAlive, screen: 'scenario_select' })
+    set({ profile, companionsAlive, screen: 'profile_card' })
   },
+
+  confirmProfile: () => set({ screen: 'scenario_select' }),
 
   selectScenario: (scenarioId: string) => {
     const scenario = allScenarios[scenarioId]

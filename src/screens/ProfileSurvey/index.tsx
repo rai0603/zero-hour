@@ -70,10 +70,39 @@ const defaultProfile: PlayerProfile = {
   selfRatedKnowledge: '',
 }
 
+function randomProfile(): PlayerProfile {
+  function pick<T>(arr: T[]): T {
+    return arr[Math.floor(Math.random() * arr.length)]
+  }
+  function pickMulti<T>(arr: T[]): T[] {
+    const count = Math.floor(Math.random() * Math.min(3, arr.length)) + 1
+    const shuffled = [...arr].sort(() => Math.random() - 0.5)
+    return shuffled.slice(0, count)
+  }
+
+  const q = profileQuestions
+  return {
+    gender: pick(q.find(p => p.id === 'gender')!.options).value,
+    ageGroup: pick(q.find(p => p.id === 'ageGroup')!.options).value,
+    location: pick(q.find(p => p.id === 'location')!.options).value,
+    companions: pickMulti(q.find(p => p.id === 'companions')!.options).map(o => o.value),
+    vehicles: pickMulti(q.find(p => p.id === 'vehicles')!.options).map(o => o.value),
+    supplies: pickMulti(q.find(p => p.id === 'supplies')!.options).map(o => o.value),
+    healthStatus: pick(q.find(p => p.id === 'healthStatus')!.options).value,
+    occupation: pick(q.find(p => p.id === 'occupation')!.options).value,
+    selfRatedKnowledge: pick(q.find(p => p.id === 'selfRatedKnowledge')!.options).value,
+  }
+}
+
 export default function ProfileSurvey() {
   const [step, setStep] = useState(0)
   const [answers, setAnswers] = useState<PlayerProfile>({ ...defaultProfile })
   const setProfile = useGameStore(s => s.setProfile)
+
+  function handleRandom() {
+    const profile = randomProfile()
+    setProfile(profile)
+  }
 
   const current = profileQuestions[step]
   const isLast = step === profileQuestions.length - 1
@@ -115,7 +144,17 @@ export default function ProfileSurvey() {
     <div className="min-h-screen bg-gray-950 flex flex-col px-4 py-6 max-w-lg mx-auto">
       {/* Header */}
       <div className="mb-6">
-        <p className="text-orange-500 text-xs font-bold tracking-widest mb-1">// 人物側寫</p>
+        <div className="flex items-center justify-between mb-1">
+          <p className="text-orange-500 text-xs font-bold tracking-widest">// 人物側寫</p>
+          {step === 0 && (
+            <button
+              onClick={handleRandom}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-300 text-xs font-bold transition-colors"
+            >
+              🎲 隨機生成角色
+            </button>
+          )}
+        </div>
         <div className="flex gap-1 mb-4">
           {profileQuestions.map((_, i) => (
             <div

@@ -2,7 +2,7 @@ export type OptionType = 'OPTIMAL' | 'SUBOPTIMAL' | 'RISKY' | 'FATAL' | 'DYNAMIC
 
 export type GameStatus = 'playing' | 'completed' | 'failed'
 
-export type Screen = 'start' | 'survey' | 'scenario_select' | 'intro' | 'question' | 'feedback' | 'gameover' | 'result' | 'wishpool'
+export type Screen = 'start' | 'survey' | 'profile_card' | 'scenario_select' | 'intro' | 'question' | 'feedback' | 'gameover' | 'result' | 'wishpool'
 
 export type FailureType =
   | 'DEATH'
