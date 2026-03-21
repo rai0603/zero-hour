@@ -418,6 +418,27 @@ export default function ResultScreen() {
         重新測試
       </motion.button>
 
+      {/* 贊助版位 */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.5 }}
+        className="mt-8 border border-dashed border-gray-700 rounded-xl p-4 text-center"
+      >
+        <p className="text-gray-600 text-xs font-bold tracking-widest mb-1">// 贊助版位</p>
+        <p className="text-gray-500 text-xs mb-3">您的品牌可以出現在這裡，觸及關心台灣防災的受眾</p>
+        <a
+          href={`mailto:?subject=${encodeURIComponent('零時生存廣告合作洽詢')}&body=${encodeURIComponent('您好，我想了解零時生存（ZERO HOUR）的廣告版位合作方案，請問報價與詳細資訊？')}`}
+          onClick={(e) => {
+            e.preventDefault()
+            window.location.href = `mailto:rai0603@gmail.com?subject=${encodeURIComponent('零時生存廣告合作洽詢')}&body=${encodeURIComponent('您好，我想了解零時生存（ZERO HOUR）的廣告版位合作方案，請問報價與詳細資訊？')}`
+          }}
+          className="inline-block px-4 py-2 bg-gray-800 hover:bg-gray-700 border border-gray-600 text-gray-300 hover:text-white rounded-lg text-xs font-bold transition-colors"
+        >
+          📩 洽詢廣告合作
+        </a>
+      </motion.div>
+
       <p className="text-center text-gray-700 text-xs mt-6 leading-relaxed">
         這只是模擬情境。若您對災難應變感到焦慮，請聯絡專業資源。
       </p>
