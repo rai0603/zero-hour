@@ -3,7 +3,7 @@ import html2canvas from 'html2canvas'
 const APP_URL = 'https://zerohourtw.com'
 
 // 只有手機才用 Web Share API（桌機的系統分享面板不含 Facebook/IG）
-const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
+export const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
 
 export async function captureCard(element: HTMLElement, filename: string): Promise<{ blob: Blob; file: File }> {
   const canvas = await html2canvas(element, {
@@ -34,17 +34,24 @@ export async function shareNative(element: HTMLElement, grade: string, score: nu
 }
 
 // 分享到 Facebook
-export function shareToFacebook(grade: string, score: number): void {
-  const text = `我在零時生存的備災等級是 ${grade}（${score}/500 分）！來測試你的應變能力👇\n${APP_URL}`
-  const fbUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(APP_URL)}&quote=${encodeURIComponent(text)}`
-  window.open(fbUrl, '_blank', 'width=600,height=500,noopener')
+export async function shareToFacebook(grade: string, score: number): Promise<void> {
+  const text = `我在零時生存的備災等級是 ${grade}（${score}/500 分）！來測試你的應變能力👇`
+  if (isMobile && navigator.share) {
+    await navigator.share({ title: '零時生存 ZERO HOUR', text, url: APP_URL })
+  } else {
+    const fbUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(APP_URL)}&quote=${encodeURIComponent(text)}`
+    window.open(fbUrl, '_blank', 'width=600,height=500,noopener')
+  }
 }
 
-// 分享到 Instagram（無 intent URL，複製連結後開啟 IG）
+// 分享到 Instagram
 export async function shareToInstagram(grade: string, score: number): Promise<void> {
-  const text = `我在零時生存的備災等級是 ${grade}（${score}/500 分）！來測試你的應變能力👇\n${APP_URL}`
-  await navigator.clipboard.writeText(text)
-  window.open('https://www.instagram.com', '_blank', 'noopener')
+  const text = `我在零時生存的備災等級是 ${grade}（${score}/500 分）！來測試你的應變能力👇`
+  if (isMobile && navigator.share) {
+    await navigator.share({ title: '零時生存 ZERO HOUR', text, url: APP_URL })
+  } else {
+    await navigator.clipboard.writeText(`${text}\n${APP_URL}`)
+  }
 }
 
 // 分享邀請卡

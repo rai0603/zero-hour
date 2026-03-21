@@ -3,7 +3,7 @@ import { motion } from 'framer-motion'
 import { useGameStore } from '../../store/gameStore'
 import { getGradeInfo } from '../../engine/scoreEngine'
 import { generateReport } from '../../utils/generateReport'
-import { shareNative, shareToFacebook, shareToInstagram, shareToThreads, downloadCard, copyLink } from '../../utils/shareResult'
+import { shareNative, shareToFacebook, shareToInstagram, shareToThreads, downloadCard, copyLink, isMobile } from '../../utils/shareResult'
 import ShareCard from '../../components/ShareCard'
 import ScoreDistributionChart from '../../components/ScoreDistributionChart'
 import RecentResultsTicker from '../../components/RecentResultsTicker'
@@ -107,13 +107,13 @@ export default function ResultScreen() {
     try { await shareNative(shareCardRef.current, grade, score) } finally { setSharing(null) }
   }
 
-  function handleShareFacebook() {
-    shareToFacebook(grade, score)
+  async function handleShareFacebook() {
+    await shareToFacebook(grade, score)
   }
 
   async function handleShareInstagram() {
     await shareToInstagram(grade, score)
-    showToast('已複製連結！請貼到 Instagram 貼文')
+    if (!isMobile) showToast('已複製連結！請貼到 Instagram 貼文')
   }
 
   async function handleDownload() {
