@@ -35,33 +35,32 @@ export async function shareNative(element: HTMLElement, grade: string, score: nu
 
 // 分享到 Facebook
 export async function shareToFacebook(element: HTMLElement, grade: string, score: number): Promise<'shared' | 'downloaded'> {
-  const { blob } = await captureCard(element, `zerohour-${grade}-${score}.png`)
+  const { file, blob } = await captureCard(element, `zerohour-${grade}-${score}.png`)
+  const text = `我在零時生存的備災等級是 ${grade}（${score}/500 分）！來測試你的應變能力👇\n${APP_URL}`
 
-  if (isMobile) {
-    // 手機：下載圖片 + 開 Facebook app
-    await downloadBlob(blob, `zerohour-${grade}-${score}.png`)
-    setTimeout(() => window.open('https://www.facebook.com', '_blank', 'noopener'), 300)
-    return 'downloaded'
+  if (isMobile && navigator.canShare?.({ files: [file] })) {
+    await navigator.share({ files: [file], title: '零時生存 ZERO HOUR', text })
+    return 'shared'
   } else {
-    // 桌機：下載圖片 + 開 Facebook
-    await downloadBlob(blob, `zerohour-${grade}-${score}.png`)
-    const text = `我在零時生存的備災等級是 ${grade}（${score}/500 分）！來測試你的應變能力👇\n${APP_URL}`
     const fbUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(APP_URL)}&quote=${encodeURIComponent(text)}`
     window.open(fbUrl, '_blank', 'width=600,height=500,noopener')
+    await downloadBlob(blob, `zerohour-${grade}-${score}.png`)
     return 'downloaded'
   }
 }
 
 // 分享到 Instagram
 export async function shareToInstagram(element: HTMLElement, grade: string, score: number): Promise<'shared' | 'downloaded'> {
-  const { blob } = await captureCard(element, `zerohour-${grade}-${score}.png`)
+  const { file, blob } = await captureCard(element, `zerohour-${grade}-${score}.png`)
+  const text = `我在零時生存的備災等級是 ${grade}（${score}/500 分）！來測試你的應變能力👇\n${APP_URL}`
 
-  // 手機 + 桌機：下載圖片 + 開 Instagram
-  await downloadBlob(blob, `zerohour-${grade}-${score}.png`)
-  if (isMobile) {
-    setTimeout(() => window.open('https://www.instagram.com', '_blank', 'noopener'), 300)
+  if (isMobile && navigator.canShare?.({ files: [file] })) {
+    await navigator.share({ files: [file], title: '零時生存 ZERO HOUR', text })
+    return 'shared'
+  } else {
+    await downloadBlob(blob, `zerohour-${grade}-${score}.png`)
+    return 'downloaded'
   }
-  return 'downloaded'
 }
 
 // 分享邀請卡

@@ -126,12 +126,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   selectOption: (option) => {
     const state = get()
-    const { score, consecutiveOptimal, hasRisky, questionHistory, selectedScenarioId, maxRawScore, currentOptions } = state
+    const { score, consecutiveOptimal, hasRisky, questionHistory, maxRawScore, currentOptions } = state
 
-    const scenario = selectedScenarioId ? allScenarios[selectedScenarioId] : null
-    const currentQuestion = scenario?.questions[state.currentQuestionId]
-    const isTimedQuestion = !!currentQuestion?.timeLimit
-    const earned = calcScore(option.type, option.scoreDelta, false, isTimedQuestion)
+    const earned = calcScore(option.type, option.scoreDelta, false, false)
 
     const historyEntry: QuestionHistory = {
       questionId: state.currentQuestionId,
