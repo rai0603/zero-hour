@@ -1,14 +1,15 @@
-import { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useGameStore } from '../../store/gameStore'
 import { allScenarios } from '../../data/scenarioLoader'
 import { type Option } from '../../types'
 
-function HUD({ score, riskLevel, resourceLevel, phaseName }: {
+function HUD({ score, riskLevel, resourceLevel, phaseName, timerNode }: {
   score: number
   riskLevel: number
   resourceLevel: number
   phaseName: string
+  timerNode?: React.ReactNode
 }) {
   return (
     <div className="bg-gray-950 border-b border-gray-800 px-4 py-3">
@@ -16,7 +17,10 @@ function HUD({ score, riskLevel, resourceLevel, phaseName }: {
         <span className="text-orange-400 text-xs font-bold tracking-wide">
           {phaseName}
         </span>
-        <span className="text-white font-bold text-sm">{score} 分</span>
+        <div className="flex items-center gap-3">
+          <span className="text-white font-bold text-sm">{score} 分</span>
+          {timerNode}
+        </div>
       </div>
       <div className="flex gap-3">
         <div className="flex-1">
@@ -129,23 +133,19 @@ export default function QuestionScreen() {
 
   if (!question) return null
 
+  const timerNode = question.timeLimit ? (
+    <CountdownTimer
+      key={currentQuestionId}
+      timeLimit={question.timeLimit}
+      onTimeout={handleTimeout}
+    />
+  ) : undefined
+
   return (
-    <div className="min-h-screen bg-gray-950 flex flex-col">
-      <HUD score={score} riskLevel={riskLevel} resourceLevel={resourceLevel} phaseName={question.phaseName} />
+    <div className="h-[100dvh] bg-gray-950 flex flex-col">
+      <HUD score={score} riskLevel={riskLevel} resourceLevel={resourceLevel} phaseName={question.phaseName} timerNode={timerNode} />
 
-      <div className="flex-1 flex flex-col px-4 py-5 max-w-lg mx-auto w-full">
-        {/* Phase + Timer row */}
-        <div className="flex items-center justify-between mb-4">
-          <span className="text-gray-500 text-xs">{question.phaseName}</span>
-          {question.timeLimit && (
-            <CountdownTimer
-              key={currentQuestionId}
-              timeLimit={question.timeLimit}
-              onTimeout={handleTimeout}
-            />
-          )}
-        </div>
-
+      <div className="flex-1 flex flex-col px-4 py-5 max-w-lg mx-auto w-full overflow-y-auto" style={{ paddingBottom: 'max(20px, env(safe-area-inset-bottom))' }}>
         {/* Situation */}
         <AnimatePresence mode="wait">
           <motion.div

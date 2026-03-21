@@ -1,6 +1,6 @@
 import html2canvas from 'html2canvas'
 
-const APP_URL = 'https://zerohour.app'
+const APP_URL = 'https://zero-hour-d4d.pages.dev'
 
 // 只有手機才用 Web Share API（桌機的系統分享面板不含 Facebook/IG）
 const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)

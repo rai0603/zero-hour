@@ -22,6 +22,13 @@ function normalizeNextQuestionId(id: string): string {
   return id
 }
 
+function calcTimeLimit(situationText: string, questionText: string, optionTexts: string[]): number {
+  const totalChars = situationText.length + questionText.length + optionTexts.reduce((s, t) => s + t.length, 0)
+  // 短題目（~100字）→ 30秒；長題目（~500字）→ 45秒
+  const ratio = Math.min(1, Math.max(0, (totalChars - 100) / 400))
+  return Math.round(30 + ratio * 15)
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function loadScenario(jsonData: any): ScenarioData {
   const scenario = jsonData.scenario
@@ -65,7 +72,7 @@ export function loadScenario(jsonData: any): ScenarioData {
       situationText: jq.situation ?? '',
       questionText: jq.question ?? '',
       options,
-      timeLimit: jq.time_limit_seconds ?? undefined,
+      timeLimit: calcTimeLimit(jq.situation ?? '', jq.question ?? '', (jq.options ?? []).map((o: any) => o.text ?? '')),
       knowledgeTags: [],
     }
 
