@@ -11,10 +11,36 @@ interface Wish {
   content: string
   vote_count: number
   created_at: string
+  display_name: string | null
+}
+
+const ADMIN_EMAIL = 'rai0603@gmail.com'
+
+const BLOCKED_KEYWORDS = [
+  '謀殺', '殺人', '殺死', '殺害', '虐殺', '屠殺',
+  '色情', '性愛', '做愛', '裸體', '性交', '淫穢', '亂倫', '情色', '猥褻', 'AV片', '成人片',
+  '身分證字號', '信用卡號', '銀行帳號', '提供個資', '填寫個資', '私訊我', '加賴', '加line',
+]
+
+function checkBlocked(text: string): string | null {
+  const lower = text.toLowerCase()
+  for (const kw of BLOCKED_KEYWORDS) {
+    if (lower.includes(kw.toLowerCase())) return kw
+  }
+  return null
+}
+
+function getDisplayName(user: { email?: string | null; user_metadata?: Record<string, string> } | null): string {
+  if (!user) return '匿名'
+  return user.user_metadata?.full_name
+    || user.user_metadata?.name
+    || user.email?.split('@')[0]
+    || '匿名'
 }
 
 export default function WishPool() {
   const goToStart = useGameStore(s => s.fullReset)
+  const isAdmin = (user: { email?: string | null } | null) => user?.email === ADMIN_EMAIL
   const { user } = useAuth()
 
   const [wishes, setWishes] = useState<Wish[]>([])
@@ -70,11 +96,16 @@ export default function WishPool() {
       setSubmitError('請輸入 5～200 字的內容')
       return
     }
+    const blocked = checkBlocked(trimmed)
+    if (blocked) {
+      setSubmitError(`內容含有不允許的關鍵字，請修改後再試`)
+      return
+    }
     setSubmitting(true)
     setSubmitError(null)
     const { error } = await supabase
       .from('zerohour_wishes')
-      .insert({ user_id: user.id, content: trimmed })
+      .insert({ user_id: user.id, content: trimmed, display_name: getDisplayName(user) })
     if (error) {
       setSubmitError('提交失敗，請稍後再試')
     } else {
@@ -82,6 +113,11 @@ export default function WishPool() {
       await fetchWishes()
     }
     setSubmitting(false)
+  }
+
+  async function deleteWish(wishId: string) {
+    await supabase.from('zerohour_wishes').delete().eq('id', wishId)
+    setWishes(prev => prev.filter(w => w.id !== wishId))
   }
 
   async function toggleVote(wishId: string, hasVoted: boolean) {
@@ -179,15 +215,28 @@ export default function WishPool() {
               >
                 <div className="flex-1 min-w-0">
                   <p className="text-gray-200 text-sm leading-relaxed">{wish.content}</p>
-                  <p className="text-gray-600 text-xs mt-1">{formatDate(wish.created_at)}</p>
+                  <p className="text-gray-600 text-xs mt-1">
+                    {wish.display_name ?? '匿名用戶'}・{formatDate(wish.created_at)}
+                  </p>
                 </div>
-                <button
-                  onClick={() => toggleVote(wish.id, hasVoted)}
-                  className={`flex flex-col items-center gap-0.5 min-w-[40px] pt-0.5 transition-colors ${hasVoted ? 'text-red-400' : 'text-gray-600 hover:text-red-400'}`}
-                >
-                  <span className="text-xl leading-none">{hasVoted ? '❤️' : '🤍'}</span>
-                  <span className="text-xs font-bold">{wish.vote_count}</span>
-                </button>
+                <div className="flex flex-col items-center gap-1 shrink-0">
+                  <button
+                    onClick={() => toggleVote(wish.id, hasVoted)}
+                    className={`flex flex-col items-center gap-0.5 min-w-[40px] pt-0.5 transition-colors ${hasVoted ? 'text-red-400' : 'text-gray-600 hover:text-red-400'}`}
+                  >
+                    <span className="text-xl leading-none">{hasVoted ? '❤️' : '🤍'}</span>
+                    <span className="text-xs font-bold">{wish.vote_count}</span>
+                  </button>
+                  {isAdmin(user) && (
+                    <button
+                      onClick={() => deleteWish(wish.id)}
+                      className="text-gray-700 hover:text-red-500 text-xs transition-colors mt-1"
+                      title="管理員刪除"
+                    >
+                      🗑
+                    </button>
+                  )}
+                </div>
               </motion.div>
             )
           })
