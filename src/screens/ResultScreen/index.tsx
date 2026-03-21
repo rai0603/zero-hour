@@ -89,15 +89,7 @@ export default function ResultScreen() {
 
   function handleGenerateReport() {
     if (!selectedScenarioId) return
-    if (!user) {
-      setPendingReport(true)
-      setShowAuthModal(true)
-      return
-    }
-    if (!unlockedAll) {
-      setShowPaymentModal(true)
-      return
-    }
+    // TODO: 上線前恢復付費牆（登入 + unlockedAll 檢查）
     generateReport({ score, questionHistory, bonusEvents, scenarioMeta, selectedScenarioId, profile })
   }
 
@@ -456,11 +448,7 @@ export default function ResultScreen() {
           onClick={handleGenerateReport}
           className="w-full py-3 bg-orange-600 hover:bg-orange-500 text-white font-bold rounded-lg text-sm transition-colors"
         >
-          {!user
-            ? '🔒 加入會員以解鎖完整報告'
-            : !unlockedAll
-              ? '🔓 解鎖完整報告 NT$199'
-              : '📄 下載完整報告 PDF'}
+          📄 下載完整報告 PDF
         </button>
       </motion.div>
 
