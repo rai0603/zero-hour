@@ -227,9 +227,25 @@ export function generateReport(params: {
       font-size: 12px; color: #1d4ed8; background: #eff6ff;
       border-radius: 4px; padding: 8px; margin-top: 6px;
     }
+    .sponsor-box {
+      border: 1.5px dashed #d1d5db; border-radius: 8px;
+      padding: 20px; text-align: center; margin-top: 32px; margin-bottom: 16px;
+    }
+    .sponsor-label {
+      font-size: 10px; font-weight: 700; letter-spacing: 3px;
+      color: #9ca3af; margin-bottom: 6px;
+    }
+    .sponsor-desc {
+      font-size: 12px; color: #6b7280; margin-bottom: 12px;
+    }
+    .sponsor-link {
+      display: inline-block; font-size: 12px; font-weight: 700;
+      color: #f97316; border: 1px solid #f97316;
+      padding: 6px 16px; border-radius: 6px; text-decoration: none;
+    }
     .footer {
       text-align: center; color: #9ca3af; font-size: 11px;
-      padding: 24px; border-top: 1px solid #e5e7eb; margin-top: 32px;
+      padding: 24px; border-top: 1px solid #e5e7eb; margin-top: 16px;
     }
     @media print {
       body { padding: 0; }
@@ -288,6 +304,14 @@ export function generateReport(params: {
     <div class="section">
       <h2>// 逐題解析</h2>
       ${questionRows}
+    </div>
+
+    <div class="sponsor-box">
+      <p class="sponsor-label">// 贊助版位</p>
+      <p class="sponsor-desc">您的品牌可以出現在這份報告中，觸及關心台灣防災的受眾</p>
+      <a class="sponsor-link" href="mailto:?subject=零時生存廣告合作洽詢&body=您好，我想了解零時生存（ZERO HOUR）的廣告版位合作方案，請問報價與詳細資訊？" onclick="this.href='mailto:rai0603@gmail.com?subject=' + encodeURIComponent('零時生存廣告合作洽詢') + '&body=' + encodeURIComponent('您好，我想了解零時生存（ZERO HOUR）的廣告版位合作方案，請問報價與詳細資訊？')">
+        📩 洽詢廣告合作
+      </a>
     </div>
 
     <div class="footer">
