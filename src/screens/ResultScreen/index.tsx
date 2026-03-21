@@ -7,6 +7,7 @@ import { shareNative, shareToFacebook, shareToInstagram, shareToThreads, downloa
 import ShareCard from '../../components/ShareCard'
 import InviteCard from '../../components/InviteCard'
 import ScoreDistributionChart from '../../components/ScoreDistributionChart'
+import RecentResultsTicker from '../../components/RecentResultsTicker'
 import { useAuth } from '../../contexts/AuthContext'
 import { useProfile } from '../../hooks/useProfile'
 import AuthModal from '../AuthModal'
@@ -60,11 +61,21 @@ export default function ResultScreen() {
     setTimeout(() => setShareToast(null), 3500)
   }
 
-  // 已登入時自動儲存
+  // 已登入時自動儲存（帶入 display_name / avatar / country）
+  const triedSave = useRef(false)
   useEffect(() => {
-    if (user && !resultSaved) {
-      saveResult(user.id)
-    }
+    if (!user || resultSaved || triedSave.current) return
+    triedSave.current = true
+    const displayName =
+      user.user_metadata?.full_name ||
+      user.user_metadata?.name ||
+      user.email?.split('@')[0] ||
+      '匿名'
+    const avatarUrl = user.user_metadata?.avatar_url ?? undefined
+    fetch('https://ipapi.co/country_code/')
+      .then(r => r.text())
+      .then(country => saveResult(user.id, { displayName, avatarUrl, country: country.trim() }))
+      .catch(() => saveResult(user.id, { displayName, avatarUrl }))
   }, [user, resultSaved, saveResult])
 
   // 登入後若有待產出的報告，繼續走解鎖判斷
@@ -221,6 +232,16 @@ export default function ResultScreen() {
           <span>S</span>
           <span>500</span>
         </div>
+      </motion.div>
+
+      {/* 最新測試動態跑馬燈 */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.85 }}
+        className="mb-6"
+      >
+        <RecentResultsTicker />
       </motion.div>
 
       {/* Score Distribution Chart */}

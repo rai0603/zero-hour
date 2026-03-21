@@ -25,7 +25,7 @@ interface GameStore extends GameState {
   advanceQuestion: () => void
   restartScenario: () => void
   fullReset: () => void
-  saveResult: (userId: string) => Promise<void>
+  saveResult: (userId: string, meta?: { displayName?: string; country?: string; avatarUrl?: string }) => Promise<void>
   goToWishPool: () => void
   goToAccount: () => void
   goToStart: () => void
@@ -235,7 +235,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   goToAccount: () => set({ screen: 'account' }),
   goToStart: () => set({ screen: 'start' }),
 
-  saveResult: async (userId: string) => {
+  saveResult: async (userId: string, meta?: { displayName?: string; country?: string; avatarUrl?: string }) => {
     const state = get()
     const timeTaken = state.endTime && state.startTime
       ? Math.round((state.endTime.getTime() - state.startTime.getTime()) / 1000)
@@ -253,6 +253,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       bonus_events: state.bonusEvents,
       time_taken: timeTaken,
       unlocked: false,
+      display_name: meta?.displayName ?? null,
+      country: meta?.country ?? null,
+      avatar_url: meta?.avatarUrl ?? null,
     })
 
     if (error) {
