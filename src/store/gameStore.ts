@@ -61,11 +61,21 @@ const initialState: Omit<GameStore, 'startGame' | 'setProfile' | 'confirmProfile
   bonusEvents: [],
   helpedNPC: false,
   hasRisky: false,
+  maxRawScore: 0,
   currentOptions: [],
   lastChosenOption: null,
   scenarioMeta: defaultMeta,
   resultSaved: false,
   saveError: null,
+}
+
+function shuffle<T>(arr: T[]): T[] {
+  const a = [...arr]
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]]
+  }
+  return a
 }
 
 export const useGameStore = create<GameStore>((set, get) => ({
@@ -100,22 +110,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
     const firstQuestionId = scenario.firstQuestionId
     const firstQuestion = scenario.questions[firstQuestionId]
-    const options = profile && firstQuestion
+    const rawOptions = profile && firstQuestion
       ? filterOptionsByProfile(firstQuestion.options, profile)
       : firstQuestion?.options ?? []
 
     set({
       screen: 'question',
       currentQuestionId: firstQuestionId,
-      currentOptions: options,
+      currentOptions: shuffle(rawOptions),
       startTime: new Date(),
       gameStatus: 'playing',
+      maxRawScore: 0,
     })
   },
 
   selectOption: (option) => {
     const state = get()
-    const { score, consecutiveOptimal, hasRisky, questionHistory, selectedScenarioId } = state
+    const { score, consecutiveOptimal, hasRisky, questionHistory, selectedScenarioId, maxRawScore, currentOptions } = state
 
     const scenario = selectedScenarioId ? allScenarios[selectedScenarioId] : null
     const currentQuestion = scenario?.questions[state.currentQuestionId]
@@ -138,9 +149,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
       (state.currentQuestionId === 'S1_Q007' &&
         (option.id === 'S1_Q007_A' || option.id === 'S1_Q007_D'))
 
+    // 累計本題最高可得分（供分數標準化用）
+    const questionMax = Math.max(0, ...currentOptions.map(o => o.scoreDelta))
+
     set({
       lastChosenOption: option,
       score: score + earned,
+      maxRawScore: maxRawScore + questionMax,
       questionHistory: [...questionHistory, historyEntry],
       consecutiveOptimal: newConsecutive,
       hasRisky: newHasRisky,
@@ -167,11 +182,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const currentState = get()
       const bonuses = calcBonuses(currentState)
       const bonusTotal = bonuses.reduce((sum, b) => sum + b.points, 0)
+      // 標準化：最高獎勵合計 90 分，答題部分對應 410 分，總和上限 500
+      const MAX_BONUS = 90
+      const MAX_ANSWER = 500 - MAX_BONUS
+      const normalized = currentState.maxRawScore > 0
+        ? Math.round((currentState.score / currentState.maxRawScore) * MAX_ANSWER)
+        : currentState.score
       set({
         screen: 'result',
         gameStatus: 'completed',
         endTime: new Date(),
-        score: Math.min(500, currentState.score + bonusTotal),
+        score: Math.min(500, normalized + bonusTotal),
         bonusEvents: bonuses,
       })
       return
@@ -183,14 +204,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const nextQuestion = scenario.questions[lastChosenOption.nextQuestionId]
     if (!nextQuestion) return
 
-    const options = profile
+    const rawOpts = profile
       ? filterOptionsByProfile(nextQuestion.options, profile)
       : nextQuestion.options
 
     set({
       screen: 'question',
       currentQuestionId: nextQuestion.id,
-      currentOptions: options,
+      currentOptions: shuffle(rawOpts),
       lastChosenOption: null,
     })
   },
@@ -204,16 +225,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
     const firstQuestionId = scenario.firstQuestionId
     const firstQuestion = scenario.questions[firstQuestionId]
-    const options = profile && firstQuestion
+    const rawOpts2 = profile && firstQuestion
       ? filterOptionsByProfile(firstQuestion.options, profile)
       : firstQuestion?.options ?? []
 
     set({
       screen: 'question',
       currentQuestionId: firstQuestionId,
-      currentOptions: options,
+      currentOptions: shuffle(rawOpts2),
       questionHistory: [],
       score: 0,
+      maxRawScore: 0,
       riskLevel: 0,
       injuryLevel: 0,
       resourceLevel: 100,

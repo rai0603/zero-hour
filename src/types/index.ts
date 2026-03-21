@@ -86,6 +86,7 @@ export interface GameState {
   bonusEvents: BonusEvent[]
   helpedNPC: boolean
   hasRisky: boolean
+  maxRawScore: number
 }
 
 export interface ScenarioMeta {
