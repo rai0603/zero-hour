@@ -3,9 +3,8 @@ import { motion } from 'framer-motion'
 import { useGameStore } from '../../store/gameStore'
 import { getGradeInfo } from '../../engine/scoreEngine'
 import { generateReport } from '../../utils/generateReport'
-import { shareNative, shareToFacebook, shareToInstagram, shareToThreads, downloadCard, copyLink, shareInvite } from '../../utils/shareResult'
+import { shareNative, shareToFacebook, shareToInstagram, shareToThreads, downloadCard, copyLink } from '../../utils/shareResult'
 import ShareCard from '../../components/ShareCard'
-import InviteCard from '../../components/InviteCard'
 import ScoreDistributionChart from '../../components/ScoreDistributionChart'
 import RecentResultsTicker from '../../components/RecentResultsTicker'
 import { useAuth } from '../../contexts/AuthContext'
@@ -47,8 +46,6 @@ export default function ResultScreen() {
   const { user } = useAuth()
   const { unlockedAll } = useProfile()
   const shareCardRef = useRef<HTMLDivElement>(null)
-  const inviteCardRef = useRef<HTMLDivElement>(null)
-  const chartShareRef = useRef<HTMLDivElement>(null)
   const [sharing, setSharing] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
   const [shareToast, setShareToast] = useState<string | null>(null)
@@ -128,24 +125,6 @@ export default function ResultScreen() {
     } finally { setSharing(null) }
   }
 
-  async function handleShareChart() {
-    if (!chartShareRef.current || sharing) return
-    setSharing('chart')
-    try {
-      const result = await shareInvite(chartShareRef.current)
-      if (result === 'downloaded') showToast('常態分配圖已下載！')
-    } finally { setSharing(null) }
-  }
-
-  async function handleShareInvite() {
-    if (!inviteCardRef.current || sharing) return
-    setSharing('invite')
-    try {
-      const result = await shareInvite(inviteCardRef.current)
-      if (result === 'downloaded') showToast('邀請卡已下載！請分享給朋友')
-    } finally { setSharing(null) }
-  }
-
   async function handleDownload() {
     if (!shareCardRef.current || sharing) return
     setSharing('dl')
@@ -169,7 +148,6 @@ export default function ResultScreen() {
           questionHistory={questionHistory}
           bonusEvents={bonusEvents}
         />
-        <InviteCard ref={inviteCardRef} />
       </div>
 
       {/* Toast 提示 */}
@@ -377,50 +355,6 @@ export default function ResultScreen() {
             className="flex items-center justify-center gap-2 py-2.5 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-300 rounded-lg text-sm font-bold transition-colors"
           >
             {copied ? '✅ 已複製' : '🔗 複製連結'}
-          </button>
-        </div>
-      </motion.div>
-
-      {/* 常態分配圖分享 */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1.27 }}
-        className="mb-4"
-      >
-        {/* 可截圖的圖表容器 */}
-        <div ref={chartShareRef} className="bg-gray-900 border border-gray-800 rounded-xl p-4">
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-gray-500 text-xs font-bold tracking-wide">// 我的分數分佈</p>
-            <button
-              onClick={handleShareChart}
-              disabled={!!sharing}
-              className="text-xs text-gray-500 hover:text-orange-400 font-bold transition-colors disabled:opacity-50 flex items-center gap-1"
-            >
-              {sharing === 'chart' ? '生成中…' : '📤 分享圖表'}
-            </button>
-          </div>
-          <ScoreDistributionChart score={score} />
-          <p className="text-center text-gray-700 text-xs mt-2">zerohour.app</p>
-        </div>
-      </motion.div>
-
-      {/* 邀請好友區塊 */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1.29 }}
-        className="bg-gray-900 border border-gray-800 rounded-xl p-4 mb-4"
-      >
-        <p className="text-gray-500 text-xs font-bold tracking-wide mb-1">// 邀請好友測驗</p>
-        <p className="text-gray-500 text-xs mb-3">分享邀請卡，看看朋友的備災等級</p>
-        <div className="grid grid-cols-2 gap-2">
-          <button
-            onClick={handleShareInvite}
-            disabled={!!sharing}
-            className="col-span-2 flex items-center justify-center gap-2 py-2.5 bg-orange-900/30 hover:bg-orange-900/50 border border-orange-800/50 text-orange-300 rounded-lg text-sm font-bold transition-colors disabled:opacity-50"
-          >
-            🎯 {sharing === 'invite' ? '生成中…' : '分享邀請卡（LINE / FB / IG）'}
           </button>
         </div>
       </motion.div>
