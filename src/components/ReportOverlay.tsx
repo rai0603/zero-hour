@@ -176,6 +176,22 @@ export default function ReportOverlay({ onClose }: { onClose: () => void }) {
             <p className="text-gray-600 text-xs text-center mt-2">下載 PDF 版本需付費解鎖，報告內容與上方相同</p>
           </div>
 
+          {/* 贊助版位 */}
+          <div className="border border-dashed border-gray-700 rounded-xl p-4 text-center mb-8">
+            <p className="text-gray-600 text-xs font-bold tracking-widest mb-1">// 贊助版位</p>
+            <p className="text-gray-500 text-xs mb-3">您的品牌可以出現在這份報告中，觸及關心台灣防災的受眾</p>
+            <a
+              href="#"
+              onClick={(e) => {
+                e.preventDefault()
+                window.location.href = `mailto:rai0603@gmail.com?subject=${encodeURIComponent('零時生存廣告合作洽詢')}&body=${encodeURIComponent('您好，我想了解零時生存（ZERO HOUR）的廣告版位合作方案，請問報價與詳細資訊？')}`
+              }}
+              className="inline-block px-4 py-2 bg-gray-800 hover:bg-gray-700 border border-gray-600 text-gray-300 hover:text-white rounded-lg text-xs font-bold transition-colors"
+            >
+              📩 洽詢廣告合作
+            </a>
+          </div>
+
         </div>
       </motion.div>
     </AnimatePresence>
