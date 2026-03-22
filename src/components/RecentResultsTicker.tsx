@@ -35,37 +35,39 @@ function timeAgo(iso: string) {
   return `${Math.floor(diff / 86400)} 天前`
 }
 
-const CACHE_KEY = 'zh_ticker_cache'
+const CACHE_KEY = (id: string) => `zh_ticker_cache_${id}`
 const CACHE_TTL = 24 * 60 * 60 * 1000
 const ITEM_H = 60 // px per row
 const VISIBLE = 2
 
-async function fetchRecent(): Promise<TickerRow[]> {
+async function fetchRecent(scenarioId: string): Promise<TickerRow[]> {
   const { data } = await supabase
     .from('zerohour_results')
     .select('id, display_name, scenario_id, grade, score, country, avatar_url, created_at')
+    .eq('scenario_id', scenarioId)
     .order('created_at', { ascending: false })
     .limit(10)
   return (data ?? []) as TickerRow[]
 }
 
-export default function RecentResultsTicker() {
+export default function RecentResultsTicker({ scenarioId }: { scenarioId: string }) {
   const [rows, setRows] = useState<TickerRow[]>([])
   const animRef = useRef<Animation | null>(null)
   const listRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    const cached = localStorage.getItem(CACHE_KEY)
+    const cacheKey = CACHE_KEY(scenarioId)
+    const cached = localStorage.getItem(cacheKey)
     if (cached) {
       try {
         const { data, ts } = JSON.parse(cached)
         if (Date.now() - ts < CACHE_TTL) { setRows(data); return }
       } catch { /* invalid cache */ }
     }
-    fetchRecent().then(data => {
+    fetchRecent(scenarioId).then(data => {
       if (data.length > 0) {
         setRows(data)
-        localStorage.setItem(CACHE_KEY, JSON.stringify({ data, ts: Date.now() }))
+        localStorage.setItem(cacheKey, JSON.stringify({ data, ts: Date.now() }))
       }
     })
   }, [])
@@ -92,7 +94,7 @@ export default function RecentResultsTicker() {
 
   return (
     <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
-      <p className="text-gray-500 text-xs font-bold tracking-wide mb-3">// 最新測試動態</p>
+      <p className="text-gray-500 text-xs font-bold tracking-wide mb-3">// {scenarioNames[scenarioId] ?? scenarioId}・最新測試動態</p>
 
       <div
         style={{ height: ITEM_H * VISIBLE, overflow: 'hidden', position: 'relative' }}

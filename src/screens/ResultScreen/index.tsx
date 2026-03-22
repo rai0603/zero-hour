@@ -191,15 +191,18 @@ export default function ResultScreen() {
             className={`h-full rounded-full ${gradeBarColors[grade] ?? 'bg-white'}`}
           />
         </div>
-        <div className="flex justify-between text-xs text-gray-600 mt-1">
-          <span>0</span>
-          <span>F</span>
-          <span>D</span>
-          <span>C</span>
-          <span>B</span>
-          <span>A</span>
-          <span>S</span>
-          <span>500</span>
+        {/* 依實際門檻比例定位：F=80, D=180, C=280, B=380, A=450, S=500 */}
+        <div className="relative text-xs text-gray-600 mt-1" style={{ height: '16px' }}>
+          {[['0', 0], ['F', 80], ['D', 180], ['C', 280], ['B', 380], ['A', 450], ['S', 500]].map(([label, val]) => (
+            <span
+              key={label}
+              className="absolute -translate-x-1/2"
+              style={{ left: `${(Number(val) / 500) * 100}%` }}
+            >
+              {label}
+            </span>
+          ))}
+          <span className="absolute right-0">500</span>
         </div>
       </motion.div>
 
@@ -210,7 +213,7 @@ export default function ResultScreen() {
         transition={{ delay: 0.85 }}
         className="mb-6"
       >
-        <RecentResultsTicker />
+        <RecentResultsTicker scenarioId={selectedScenarioId ?? ''} />
       </motion.div>
 
       {/* Score Distribution Chart */}
