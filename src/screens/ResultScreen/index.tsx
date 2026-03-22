@@ -1,10 +1,11 @@
-import { useRef, useState, useEffect } from 'react'
+import { useRef, useState, useEffect, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import { useGameStore } from '../../store/gameStore'
 import { getGradeInfo } from '../../engine/scoreEngine'
 import { generateReport } from '../../utils/generateReport'
 import { shareNative, shareToFacebook, shareToInstagram, shareToThreads, downloadCard, copyLink, isMobile } from '../../utils/shareResult'
 import ShareCard from '../../components/ShareCard'
+import ReportOverlay from '../../components/ReportOverlay'
 import ScoreDistributionChart from '../../components/ScoreDistributionChart'
 import RecentResultsTicker from '../../components/RecentResultsTicker'
 import { useAuth } from '../../contexts/AuthContext'
@@ -52,6 +53,9 @@ export default function ResultScreen() {
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [showPaymentModal, setShowPaymentModal] = useState(false)
   const [pendingReport, setPendingReport] = useState(false)
+  const [reportUnlocked, setReportUnlocked] = useState(false)
+  const [showReportOverlay, setShowReportOverlay] = useState(false)
+  const [showShareUnlock, setShowShareUnlock] = useState(false)
 
   function showToast(msg: string) {
     setShareToast(msg)
@@ -95,10 +99,31 @@ export default function ResultScreen() {
   const riskyCount = questionHistory.filter(q => q.optionType === 'RISKY').length
   const total = questionHistory.length
 
+  const unlockReport = useCallback(() => {
+    setReportUnlocked(true)
+    setShowShareUnlock(false)
+    setShowReportOverlay(true)
+  }, [])
+
   function handleGenerateReport() {
-    if (!selectedScenarioId) return
-    // TODO: 上線前恢復付費牆（登入 + unlockedAll 檢查）
-    generateReport({ score, questionHistory, bonusEvents, scenarioMeta, selectedScenarioId, profile })
+    if (reportUnlocked) {
+      setShowReportOverlay(true)
+    } else {
+      setShowShareUnlock(true)
+    }
+  }
+
+  async function handleShareToUnlock(platform: string) {
+    if (platform === 'native') {
+      await handleShareNative()
+    } else if (platform === 'fb') {
+      await shareToFacebook(grade, score)
+    } else if (platform === 'ig') {
+      await shareToInstagram(grade, score)
+    } else if (platform === 'threads') {
+      shareToThreads(grade, score)
+    }
+    unlockReport()
   }
 
   async function handleShareNative() {
@@ -382,24 +407,65 @@ export default function ResultScreen() {
         )}
       </motion.div>
 
-      {/* CTA paid */}
+      {/* CTA 解鎖報告 */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 1.3 }}
         className="bg-orange-950/30 border border-orange-800/50 rounded-xl p-5 mb-5"
       >
-        <p className="text-orange-300 font-bold text-sm mb-1">📊 解鎖完整分析報告</p>
+        <p className="text-orange-300 font-bold text-sm mb-1">📊 完整分析報告</p>
         <p className="text-gray-400 text-xs mb-3 leading-relaxed">
-          包含逐題解析、個人弱點分析、個人化備災清單，以及學習資源推薦。
+          包含逐題解析、知識補充、個人檔案對照，免費查看。
         </p>
-        <button
-          onClick={handleGenerateReport}
-          className="w-full py-3 bg-orange-600 hover:bg-orange-500 text-white font-bold rounded-lg text-sm transition-colors"
-        >
-          📄 下載完整報告 PDF
-        </button>
+
+        {!showShareUnlock ? (
+          <button
+            onClick={handleGenerateReport}
+            className="w-full py-3 bg-orange-600 hover:bg-orange-500 text-white font-bold rounded-lg text-sm transition-colors"
+          >
+            {reportUnlocked ? '📋 查看報告' : '🔓 分享即可解鎖報告'}
+          </button>
+        ) : (
+          <div>
+            <p className="text-orange-200 text-xs font-bold text-center mb-3">分享到任一平台即可解鎖 👇</p>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={() => handleShareToUnlock('native')}
+                className="py-2.5 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-white rounded-lg text-xs font-bold transition-colors"
+              >
+                📤 系統分享
+              </button>
+              <button
+                onClick={() => handleShareToUnlock('fb')}
+                className="py-2.5 bg-blue-900/40 hover:bg-blue-900/60 border border-blue-800/60 text-blue-300 rounded-lg text-xs font-bold transition-colors"
+              >
+                Facebook
+              </button>
+              <button
+                onClick={() => handleShareToUnlock('threads')}
+                className="py-2.5 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-200 rounded-lg text-xs font-bold transition-colors"
+              >
+                @ Threads
+              </button>
+              <button
+                onClick={() => handleShareToUnlock('ig')}
+                className="py-2.5 bg-pink-900/40 hover:bg-pink-900/60 border border-pink-800/60 text-pink-300 rounded-lg text-xs font-bold transition-colors"
+              >
+                Instagram
+              </button>
+            </div>
+            <button
+              onClick={() => setShowShareUnlock(false)}
+              className="w-full mt-2 py-2 text-gray-600 hover:text-gray-400 text-xs transition-colors"
+            >
+              取消
+            </button>
+          </div>
+        )}
       </motion.div>
+
+      {showReportOverlay && <ReportOverlay onClose={() => setShowReportOverlay(false)} />}
 
       {/* Replay */}
       <motion.button
