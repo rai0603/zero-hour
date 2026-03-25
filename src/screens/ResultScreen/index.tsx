@@ -45,7 +45,8 @@ export default function ResultScreen() {
   const saveResult = useGameStore(s => s.saveResult)
 
   const { user } = useAuth()
-  const { unlockedAll } = useProfile()
+  const { unlockedAll, pdfUnlocked, refetchProfile } = useProfile()
+  const [showPaymentForPdf, setShowPaymentForPdf] = useState(false)
   const shareCardRef = useRef<HTMLDivElement>(null)
   const [sharing, setSharing] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
@@ -465,7 +466,13 @@ export default function ResultScreen() {
         )}
       </motion.div>
 
-      {showReportOverlay && <ReportOverlay onClose={() => setShowReportOverlay(false)} />}
+      {showReportOverlay && (
+        <ReportOverlay
+          onClose={() => setShowReportOverlay(false)}
+          pdfUnlocked={pdfUnlocked}
+          onRequestPdfUnlock={() => setShowPaymentForPdf(true)}
+        />
+      )}
 
       {/* Replay */}
       <motion.button
@@ -514,7 +521,21 @@ export default function ResultScreen() {
       )}
 
       {showPaymentModal && (
-        <PaymentModal onClose={() => setShowPaymentModal(false)} />
+        <PaymentModal onClose={() => setShowPaymentModal(false)} onPdfUnlocked={() => {}} refetchProfile={refetchProfile} pdfUnlocked={pdfUnlocked} />
+      )}
+
+      {showPaymentForPdf && (
+        <PaymentModal
+          onClose={() => setShowPaymentForPdf(false)}
+          refetchProfile={refetchProfile}
+          pdfUnlocked={pdfUnlocked}
+          onPdfUnlocked={() => {
+            setShowPaymentForPdf(false)
+            if (selectedScenarioId) {
+              generateReport({ score, questionHistory, bonusEvents, scenarioMeta, selectedScenarioId, profile })
+            }
+          }}
+        />
       )}
     </div>
   )

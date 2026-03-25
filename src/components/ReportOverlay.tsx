@@ -31,7 +31,11 @@ const gradeColors: Record<string, string> = {
   C: 'text-orange-400', D: 'text-red-400', F: 'text-gray-500',
 }
 
-export default function ReportOverlay({ onClose }: { onClose: () => void }) {
+export default function ReportOverlay({ onClose, pdfUnlocked, onRequestPdfUnlock }: {
+  onClose: () => void
+  pdfUnlocked: boolean
+  onRequestPdfUnlock: () => void
+}) {
   const score = useGameStore(s => s.score)
   const bonusEvents = useGameStore(s => s.bonusEvents)
   const questionHistory = useGameStore(s => s.questionHistory)
@@ -49,7 +53,10 @@ export default function ReportOverlay({ onClose }: { onClose: () => void }) {
 
   function handleDownloadPDF() {
     if (!selectedScenarioId) return
-    // TODO: 恢復付費牆（ECPay 串接後）
+    if (!pdfUnlocked) {
+      onRequestPdfUnlock()
+      return
+    }
     generateReport({ score, questionHistory, bonusEvents, scenarioMeta, selectedScenarioId, profile })
   }
 
@@ -171,9 +178,11 @@ export default function ReportOverlay({ onClose }: { onClose: () => void }) {
               onClick={handleDownloadPDF}
               className="w-full py-3 bg-orange-600 hover:bg-orange-500 text-white font-bold rounded-xl text-sm transition-colors"
             >
-              📄 下載完整報告 PDF（付費解鎖）
+              {pdfUnlocked ? '📄 下載 PDF 報告' : '🔒 下載 PDF 報告（NT$99 解鎖）'}
             </button>
-            <p className="text-gray-600 text-xs text-center mt-2">下載 PDF 版本需付費解鎖，報告內容與上方相同</p>
+            {!pdfUnlocked && (
+              <p className="text-gray-600 text-xs text-center mt-2">一次付費，永久下載，報告內容與上方相同</p>
+            )}
           </div>
 
           {/* 贊助版位 */}

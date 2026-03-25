@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 1200px;
+    height: 630px;
+    background: #080808;
+    font-family: -apple-system, "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* 背景漸層 */
+  .bg {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 50% 0%, #7c2d12 0%, transparent 60%),
+      radial-gradient(ellipse at 0% 100%, #1c1917 0%, transparent 50%),
+      radial-gradient(ellipse at 100% 100%, #1c1917 0%, transparent 50%),
+      #090909;
+  }
+
+  /* 橘紅線條裝飾 */
+  .accent-line {
+    position: absolute;
+    left: 60px; right: 60px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #f97316, transparent);
+  }
+  .accent-line.top { top: 56px; }
+  .accent-line.bottom { bottom: 56px; }
+
+  /* 主內容 */
+  .content {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 64px 72px;
+    gap: 64px;
+  }
+
+  /* 左側 */
+  .left {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .label {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 5px;
+    color: #f97316;
+    margin-bottom: 16px;
+  }
+
+  .title {
+    font-size: 96px;
+    font-weight: 900;
+    color: #ffffff;
+    letter-spacing: 12px;
+    line-height: 1;
+    margin-bottom: 8px;
+    text-shadow: 0 4px 32px rgba(249,115,22,0.3);
+  }
+
+  .subtitle-en {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 8px;
+    color: #f97316;
+    margin-bottom: 20px;
+  }
+
+  .subtitle-zh {
+    font-size: 28px;
+    font-weight: 700;
+    color: #e5e7eb;
+    letter-spacing: 3px;
+    margin-bottom: 32px;
+  }
+
+  .domain {
+    font-size: 16px;
+    font-weight: 600;
+    color: #6b7280;
+    letter-spacing: 2px;
+  }
+
+  /* 右側：情境列表 */
+  .right {
+    width: 340px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .right-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    color: #f97316;
+    margin-bottom: 6px;
+  }
+
+  .scenario {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(249,115,22,0.2);
+    border-radius: 10px;
+    padding: 12px 18px;
+  }
+
+  .scenario-id {
+    font-size: 12px;
+    font-weight: 900;
+    color: #f97316;
+    letter-spacing: 1px;
+    min-width: 28px;
+  }
+
+  .scenario-name {
+    font-size: 18px;
+    font-weight: 700;
+    color: #f3f4f6;
+    letter-spacing: 2px;
+  }
+</style>
+</head>
+<body>
+  <div class="bg"></div>
+  <div class="accent-line top"></div>
+  <div class="accent-line bottom"></div>
+
+  <div class="content">
+    <div class="left">
+      <p class="label">// TAIWAN DISASTER SIMULATION</p>
+      <h1 class="title">零時生存</h1>
+      <p class="subtitle-en">ZERO HOUR</p>
+      <p class="subtitle-zh">台灣災難應變能力測試</p>
+      <p class="domain">zerohourtw.com</p>
+    </div>
+
+    <div class="right">
+      <p class="right-label">// 七大情境</p>
+      <div class="scenario"><span class="scenario-id">S1</span><span class="scenario-name">大地震</span></div>
+      <div class="scenario"><span class="scenario-id">S2</span><span class="scenario-name">海嘯警報</span></div>
+      <div class="scenario"><span class="scenario-id">S3</span><span class="scenario-name">戰爭衝突</span></div>
+      <div class="scenario"><span class="scenario-id">S4</span><span class="scenario-name">異常天候</span></div>
+      <div class="scenario"><span class="scenario-id">S5</span><span class="scenario-name">恐怖攻擊</span></div>
+      <div class="scenario"><span class="scenario-id">S6</span><span class="scenario-name">疫情感染</span></div>
+      <div class="scenario"><span class="scenario-id">S7</span><span class="scenario-name">不明生物</span></div>
+    </div>
+  </div>
+</body>
+</html>

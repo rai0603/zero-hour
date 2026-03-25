@@ -1,25 +1,33 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
 
 export function useProfile() {
   const { user } = useAuth()
   const [unlockedAll, setUnlockedAll] = useState(false)
+  const [pdfUnlocked, setPdfUnlocked] = useState(false)
   const [loadingProfile, setLoadingProfile] = useState(false)
 
-  useEffect(() => {
-    if (!user) { setUnlockedAll(false); return }
+  const fetchProfile = useCallback(async (userId: string) => {
     setLoadingProfile(true)
-    supabase
+    const { data } = await supabase
       .from('zerohour_profiles')
-      .select('unlocked_all')
-      .eq('user_id', user.id)
+      .select('unlocked_all, pdf_unlocked')
+      .eq('user_id', userId)
       .maybeSingle()
-      .then(({ data }) => {
-        setUnlockedAll(data?.unlocked_all ?? false)
-        setLoadingProfile(false)
-      })
-  }, [user])
+    setUnlockedAll(data?.unlocked_all ?? false)
+    setPdfUnlocked(data?.pdf_unlocked ?? false)
+    setLoadingProfile(false)
+  }, [])
 
-  return { unlockedAll, loadingProfile }
+  useEffect(() => {
+    if (!user) { setUnlockedAll(false); setPdfUnlocked(false); return }
+    fetchProfile(user.id)
+  }, [user, fetchProfile])
+
+  const refetchProfile = useCallback(() => {
+    if (user) fetchProfile(user.id)
+  }, [user, fetchProfile])
+
+  return { unlockedAll, pdfUnlocked, loadingProfile, refetchProfile }
 }
